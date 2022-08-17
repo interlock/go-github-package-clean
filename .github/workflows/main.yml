@@ -5,12 +5,12 @@ name: CI
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  # release:
-  #   types: [created]
+  # push:
+  #   branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
+  release:
+    types: [created]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -44,8 +44,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           project_path: "./cmd"
           goversion: 1.18
-          build_command: go build ./cmd/main.go
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           pre_command: export CGO_ENABLED=0
-          ldflags: -static
+          ldflags: -extldflags -static
