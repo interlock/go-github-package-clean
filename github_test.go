@@ -4,44 +4,25 @@ import (
 	"testing"
 )
 
-func Test_BelowMax(t *testing.T) {
-	config := &Config{}
-	config.MaxVersions = 100
+var calcTests [][]int = [][]int{
+	{100, 80, 0},
+	{20, 20, 0},
+	{20, 21, 1},
+	{20, 80, 1},
+	{120, 140, 2},
+	{120, 220, 2},
+}
 
-	if p, _ := CalculateStartPage(config, 80); p != 0 {
-		t.Errorf("expected page 0 but got %d", p)
+func Test_CalculateStartPage(t *testing.T) {
+	config := &Config{}
+	for _, v := range calcTests {
+		config.MaxVersions = v[0]
+		if p, _ := CalculateStartPage(config, v[1]); p != v[2] {
+			t.Errorf("maxVersion=%d versionCount=%d expected page %d but got %d", v[0], v[1], v[2], p)
+		}
 	}
 }
 
-func Test_WithinPageSize(t *testing.T) {
-	config := &Config{}
-	config.MaxVersions = 20
+func Test_GetPackage(t *testing.T) {
 
-	if p, _ := CalculateStartPage(config, 20); p != 0 {
-
-		t.Errorf("expected page 0 but got %d", p)
-	}
-
-	if p, _ := CalculateStartPage(config, 21); p != 1 {
-
-		t.Errorf("expected page 1 but got %d", p)
-	}
-
-	if p, _ := CalculateStartPage(config, 80); p != 1 {
-
-		t.Errorf("expected page 1 but got %d", p)
-	}
-}
-
-func Test_OverPageSize(t *testing.T) {
-	config := &Config{}
-	config.MaxVersions = 120
-	if p, _ := CalculateStartPage(config, 140); p != 2 {
-		t.Errorf("expected page 2 but got %d", p)
-	}
-
-	if p, _ := CalculateStartPage(config, 220); p != 2 {
-
-		t.Errorf("expected page 2 but got %d", p)
-	}
 }
