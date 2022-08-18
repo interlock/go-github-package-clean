@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	config := gogithubpackageclean.ParseFlags()
+	config := gogithubpackageclean.NewConfig()
 
-	gogithubpackageclean.Process(config)
+	config.RunFatal()
 
 }

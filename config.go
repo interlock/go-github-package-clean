@@ -1,52 +1,28 @@
 package gogithubpackageclean
 
 import (
-	"flag"
 	"os"
+
+	"github.com/isobit/cli"
 )
 
 type Config struct {
-	GithubToken    string
-	Org            string
-	PackageType    string
-	PackageName    string
-	Commit         bool
-	MaxVersions    int
-	MinAge         int
-	OldestToNewest bool
-	ContinueOnFail bool
+	GithubToken    string `cli:"help='github personal access token',env=GITHUB_TOKEN,required"`
+	Org            string `cli:"help='github org or username',env=GITHUB_ORG,required"`
+	PackageType    string `cli:"help='package type: npm, maven, rubygems, docker, nuget, container',env=GITHUB_PACKAGE_TYPE,required"`
+	PackageName    string `cli:"help='package name',env=GITHUB_PACKAGE_NAME,required"`
+	Commit         bool   `cli:"help='make actual changes'"`
+	MaxVersions    int    `cli:"help='max number of versions that should be allowed to exist',name=max"`
+	MinAge         int    `cli:"help='minimum age in days for version before deleting it',name=min-age"`
+	OldestToNewest bool   `cli:"help='delete from oldest to newest'"`
+	ContinueOnFail bool   `cli:"help='continue on failure to delete'"`
 }
 
-func NewConfig() *Config {
-	config := &Config{}
-	if v, ok := os.LookupEnv("GITHUB_TOKEN"); ok {
-		config.GithubToken = v
-	}
-	if v, ok := os.LookupEnv("GITHUB_ORG"); ok {
-		config.Org = v
-	}
-	if v, ok := os.LookupEnv("GITHUB_PACKAGE_TYPE"); ok {
-		config.PackageType = v
-	}
-	if v, ok := os.LookupEnv("GITHUB_PACKAGE_NAME"); ok {
-		config.PackageName = v
-	}
-	return config
+func (c *Config) Run() error {
+	Process(c)
+	return nil
 }
 
-// flags
-
-func ParseFlags() *Config {
-	config := NewConfig()
-	flag.StringVar(&config.GithubToken, "github-token", "", "github personal access token [GITHUB_TOKEN]")
-	flag.StringVar(&config.Org, "org", "", "github org or username [GITHUB_ORG]")
-	flag.StringVar(&config.PackageType, "type", "", "package type: npm, maven, rubygems, docker, nuget, container [GITHUB_PACKAGE_TYPE]")
-	flag.StringVar(&config.PackageName, "name", "", "package name [GITHUB_PACKAGE_NAME]")
-	flag.BoolVar(&config.Commit, "commit", false, "")
-	flag.BoolVar(&config.OldestToNewest, "oldest-to-newest", false, "delete from oldest to newest")
-	flag.BoolVar(&config.ContinueOnFail, "continue-on-fail", false, "continue on failure to delete")
-	flag.IntVar(&config.MaxVersions, "max", -1, "max number of versions that should be allowed to exist")
-	flag.IntVar(&config.MinAge, "min_age", -1, "minimum age in days for version before deleting it")
-	flag.Parse()
-	return config
+func NewConfig() cli.ParseResult {
+	return cli.New(os.Args[0], &Config{}).Parse()
 }
